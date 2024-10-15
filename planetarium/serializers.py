@@ -2,6 +2,12 @@ from rest_framework import serializers
 from .models import *
 
 
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = ("id", "created_at")
+
+
 class ShowThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShowTheme
@@ -30,14 +36,18 @@ class ShowSessionSerializer(serializers.ModelSerializer):
 
 class ShowSessionListSerializer(serializers.ModelSerializer):
     astronomy_show = serializers.SlugRelatedField(
-        many=True,
+        many=False,
         read_only=True,
         slug_field="title",
     )
 
+    class Meta:
+        model = ShowSession
+        fields = "__all__"
+
 
 class ShowSessionRetrieveSerializer(ShowSessionSerializer):
-    astronomy_show = AstronomyShowSerializer(many=True)
+    astronomy_show = AstronomyShowSerializer()
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
