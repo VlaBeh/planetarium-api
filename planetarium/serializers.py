@@ -56,6 +56,13 @@ class PlanetariumDomeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PlanetariumDomeImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PlanetariumDome
+        fields = ("id", "image")
+
+
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
