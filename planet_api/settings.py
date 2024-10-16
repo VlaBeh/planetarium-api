@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import drf_spectacular
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
     'planetarium',
     'user',
     'rest_framework',
@@ -133,16 +136,27 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#REST_FRAMEWORK = {
-    #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    #'PAGE_SIZE': 3,
-#}
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         "planetarium.permissions.IsAdminALLORIsAuthenticatedOReadOnly",
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    "DEFAULT_SCHEMA_CLASS": 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Planetarium API',
+    'DESCRIPTION': 'API for Planetarium',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        "deepLinking": True,
+        "defaultModelRendering": "model",
+        "defaultModelsExpandDepth": 2,
+        "defaultModelExpandDepth": 2,
+    },
 }

@@ -21,7 +21,7 @@ class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = IsAdminALLORIsAuthenticatedOReadOnly
+    permission_classes = [IsAdminALLORIsAuthenticatedOReadOnly]
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
