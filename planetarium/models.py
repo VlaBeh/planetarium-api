@@ -1,15 +1,25 @@
+import pathlib
+import uuid
+
 from django.db import models
 from django.db.models import UniqueConstraint
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 
 from planet_api import settings
 from user.models import User
 
 
+def planetariumdome_image_path(instance, filename):
+    filename = f"{slugify(instance.name)}-{uuid.uuid4()}" + pathlib.Path(filename).suffix
+    return pathlib.Path("upload/planetariumdome") / pathlib.Path(filename)
+
+
 class PlanetariumDome(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
+    image = models.ImageField(null=True, upload_to=planetariumdome_image_path)
 
     def __str__(self):
         return self.name
