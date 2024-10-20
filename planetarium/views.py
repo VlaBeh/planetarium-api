@@ -20,7 +20,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
-    authentication_classes = (TokenAuthentication,)
+    #authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAdminALLORIsAuthenticatedOReadOnly]
 
 
