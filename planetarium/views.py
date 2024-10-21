@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
@@ -20,8 +21,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
-    #authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAdminALLORIsAuthenticatedOReadOnly]
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
@@ -31,7 +30,6 @@ class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     @action(
         methods=["POST"],
         detail=True,
-        permission_classes=[IsAdminUser],
         url_path="upload-image"
     )
     def upload_image(self, request, pk=None):
@@ -72,6 +70,12 @@ class TicketViewSet(viewsets.ModelViewSet):
             return queryset.select_related()
 
         return queryset
+
+
+class OrderSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = "page_size"
+    max_page_size = 50
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
