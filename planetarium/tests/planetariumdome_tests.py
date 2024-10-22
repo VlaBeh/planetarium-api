@@ -1,5 +1,6 @@
 from multiprocessing.connection import Client
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
@@ -30,19 +31,26 @@ def sample_show_session(**params) -> ShowSession:
 
 
 def sample_reservation(**params) -> Reservation:
+    try:
+        user = get_user_model().objects.get(email="test@test.com")
+    except ObjectDoesNotExist:
+        user = get_user_model().objects.create_user(
+            email="test@test.com",
+            password="testpass"
+        )
+
     defaults = {
-        "user": get_user_model().objects.create_user(
-            email="test@test.com", password="testpass"
-        ),
+        "user": user,
     }
     defaults.update(params)
     return Reservation.objects.create(**defaults)
 
 
 def sample_ticket(**params) -> Ticket:
-    show_session = ShowSession.objects.first()
-    reservation = Reservation.objects.first()
-
+    # Створюємо сесію, якщо її ще немає
+    show_session = ShowSession.objects.first() or sample_show_session()
+    # Створюємо резервацію, якщо її ще немає
+    reservation = Reservation.objects.first() or sample_reservation()
     defaults = {
         "row": 2,
         "seat": 23,
