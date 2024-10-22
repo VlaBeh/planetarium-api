@@ -1,9 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from planetarium.models import *
 from planetarium.permissions import IsAdminALLORIsAuthenticatedOReadOnly
@@ -26,6 +27,7 @@ class ShowThemeViewSet(viewsets.ModelViewSet):
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
+    permission_classes = [IsAdminUser]
 
     @action(
         methods=["POST"],
@@ -42,9 +44,14 @@ class PlanetariumDomeViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TicketViewSet(viewsets.ModelViewSet):
+class TicketViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    GenericViewSet):
     queryset = Ticket.objects.all().select_related()
     serializer_class = TicketSerializer
+    permission_classes = [IsAdminALLORIsAuthenticatedOReadOnly]
 
     @staticmethod
     def _params_to_ints(query_string):

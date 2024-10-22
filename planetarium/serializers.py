@@ -80,3 +80,11 @@ class TicketListSerializer(serializers.ModelSerializer):
 
 class TicketRetrieveSerializer(TicketSerializer):
     show_session = ShowSessionRetrieveSerializer(many=False, read_only=True)
+
+    def get_show_session(self, obj):
+        return {
+            'id': obj.show_session.id,
+            'astronomy_show': obj.show_session.astronomy_show.title,
+            'session_date': obj.show_session.show_time.strftime('%Y-%m-%d'),
+            'planetarium_dome': obj.show_session.planetarium_dome.id,
+        }

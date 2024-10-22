@@ -6,9 +6,15 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 from planetarium.models import Ticket, ShowSession, Reservation, AstronomyShow, PlanetariumDome
-from planetarium.serializers import TicketSerializer
+from planetarium.serializers import TicketSerializer, TicketListSerializer, TicketRetrieveSerializer
 
 TICKET_URL = reverse("planetarium:ticket-list")
+
+PLANETARIUMDOME_URL = reverse("planetarium:planetariumdome-list")
+
+
+def detail_url(ticket_id):
+    return reverse("planetarium:ticket-detail", kwargs={"pk": ticket_id})
 
 
 def sample_show_session(**params) -> ShowSession:
@@ -83,6 +89,66 @@ class AuthenticatedUserTestCase(TestCase):
 
         response = self.client.get(TICKET_URL)
         tickets = Ticket.objects.all()
-        serializer = TicketSerializer(tickets, many=True)
+        serializer = TicketListSerializer(tickets, many=True)
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["results"], serializer.data)
+
+    def test_retrieve_ticket_detail(self):
+        ticket = sample_ticket(row=2, seat=23)
+        url = detail_url(ticket.id)
+
+        response = self.client.get(url)
+
+        ticket.refresh_from_db()
+
+        serializer = TicketRetrieveSerializer(ticket)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+
+    def test_create_planetarium_dome(self):
+        payload = {
+            "name": "Sample Dome",
+            "rows": 10,
+            "seats": 23,
+        }
+
+        response = self.client.post(PLANETARIUMDOME_URL, payload)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class AdminTicketTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            email="admin@test.com", password="testpassword", is_staff=True
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_ticket(self):
+        payload = {
+            "name": "Sample Dome",
+            "rows": 10,
+            "seats_in_row": 23,
+        }
+
+        response = self.client.post(PLANETARIUMDOME_URL, payload)
+
+        self.assertIn('id', response.data)
+
+        pland = PlanetariumDome.objects.get(id=response.data["id"])
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        for key in payload:
+            self.assertEqual(payload[key], getattr(pland, key))
+
+    def test_ticket_not_allowed(self):
+        ticket = sample_ticket()
+
+        url = detail_url(ticket.id)
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

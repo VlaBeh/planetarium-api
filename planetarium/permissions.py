@@ -2,11 +2,17 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class IsAdminALLORIsAuthenticatedOReadOnly(BasePermission):
-    """The request is authenticated as a user, or is a read-only request"""
+    """Allow authenticated users to create only reservations or tickets,
+    and allow admins to perform any action. Unauthenticated users cannot access any views."""
 
     def has_permission(self, request, view):
-        return bool(
-            request.method in SAFE_METHODS
-            and request.user
-            and request.user.is_authenticated
-        ) or (request.user and request.user.is_staff)
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        if request.method in SAFE_METHODS:
+            return True
+
+        if request.method == 'POST' and view.basename in ['reservation', 'ticket']:
+            return True
+
+        return bool(request.user and request.user.is_staff)
