@@ -7,6 +7,8 @@ pytz==2023.3.post1
 sqlparse==0.5.1
 flake8==5.0.4
 tzdata==2023.4
-psycopg==3.2.3
-psycopg-binary==3.1.20
+psycopg==3.1.12
+psycopg-binary==3.1.12
 drf-spectacular==0.27.2
+djangorestframework-simplejwt
+pillow==11.0.0

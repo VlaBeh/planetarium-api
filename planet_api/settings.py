@@ -87,9 +87,9 @@ WSGI_APPLICATION = 'planet_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'default_db_name'),
-        'USER': os.environ.get('POSTGRES_USER', 'default_user'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'default_password'),
+        'NAME': os.environ.get('POSTGRES_DB', 'planet'),
+        'USER': os.environ.get('POSTGRES_USER', 'planet'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'planet'),
         'HOST': os.environ.get('POSTGRES_HOST', 'db'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
@@ -131,7 +131,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = "/files/media"
 
 MEDIA_URL = '/media/'
 
